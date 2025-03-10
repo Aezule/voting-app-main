@@ -1,0 +1,26 @@
+services:
+  app:
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      - REDIS=redis
+      - REDIS_PWD=${REDIS_PWD}
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:6-alpine
+    command: redis-server --requirepass ${REDIS_PWD}
+    volumes:
+      - redis_data:/data
+    environment:
+      - REDIS_PASSWORD=${REDIS_PWD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  redis_data:
